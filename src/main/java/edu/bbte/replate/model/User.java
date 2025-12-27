@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,7 +27,7 @@ public class User extends BaseEntity {
     private Date joinDate;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Collection<Listing> listings;
+    private List<Listing> listings;
 
     @PrePersist
     private void onCreate() {

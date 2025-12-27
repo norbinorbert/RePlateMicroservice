@@ -1,10 +1,9 @@
 package edu.bbte.replate.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Entity
@@ -17,5 +16,6 @@ public class Category extends BaseEntity {
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory")
-    private Collection<Category> subcategories;
+    @OrderBy("name ASC")
+    private List<Category> subcategories;
 }

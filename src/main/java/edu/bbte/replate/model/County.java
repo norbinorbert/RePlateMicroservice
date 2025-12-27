@@ -3,7 +3,7 @@ package edu.bbte.replate.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Entity
@@ -16,5 +16,6 @@ public class County extends BaseEntity {
     private Country country;
 
     @OneToMany(mappedBy = "county", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Collection<City> cities;
+    @OrderBy("name ASC")
+    private List<City> cities;
 }

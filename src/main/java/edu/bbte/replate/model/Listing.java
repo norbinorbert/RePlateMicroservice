@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +20,7 @@ public class Listing extends BaseEntity {
 
     @Column(nullable = false)
     @PositiveOrZero
-    private double price;
+    private Double price;
 
     @Column(nullable = false, updatable = false)
     private Timestamp datePosted;
@@ -34,7 +34,7 @@ public class Listing extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
-    private Category categories;
+    private Category category;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -42,7 +42,7 @@ public class Listing extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "listing_id")
-    private Collection<Image> images;
+    private List<Image> images;
 
     @PrePersist
     private void onCreate() {
