@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.0'
@@ -42,3 +44,12 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.register('bootRunCreate', BootRun) {
+    group = 'Application'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set(tasks.bootRun.mainClass)
+    jvmArgs = ['-Dspring.profiles.active=create']
+}
+
