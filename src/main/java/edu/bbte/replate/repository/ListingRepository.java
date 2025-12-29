@@ -19,7 +19,7 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
             // Filter by title
             if (filterCriteria.getTitle() != null) {
-                predicates.add(cb.equal(root.get("title"), filterCriteria.getTitle()));
+                predicates.add(cb.like(root.get("title"), "%" + filterCriteria.getTitle() + "%"));
             }
 
             // Filter by price
@@ -45,6 +45,8 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
         });
     }
 
+    // Helper method to build location predicate based on country, county, and city
+    // Always filters hierarchically: country -> county -> city
     private Predicate buildLocationPredicate(Path<Listing> root, CriteriaBuilder cb, String countryName,
                                              String countyName, String cityName) {
         List<Predicate> locationPredicates = new ArrayList<>();
