@@ -79,10 +79,12 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
             return cb.disjunction(); // Return false predicate if max depth exceeded
         }
 
-        // Check current category
+        // Check if current category matches the name
         Predicate currentMatch = cb.equal(categoryPath.get("name"), targetCategoryName);
 
-        // Check parent recursively
+        // Check parents recursively (basically checking if any ancestor matches the target category)
+        // example: we are filtering by "Electronics", and currently the SQL query is at the category "Mobile Phones",
+        // the query checks if "Mobile Phones"'s parent (or grandparent etc.) is "Electronics"
         Path<Category> parentPath = categoryPath.get("parentCategory");
         Predicate parentMatch = buildCategoryPredicateRecursive(parentPath, cb, targetCategoryName,
                 currentDepth + 1, maxDepth);
