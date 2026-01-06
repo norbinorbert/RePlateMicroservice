@@ -1,5 +1,7 @@
 package edu.bbte.replate.service.impl;
 
+import edu.bbte.replate.dto.incoming.RegisterDto;
+import edu.bbte.replate.mapper.UserMapper;
 import edu.bbte.replate.model.User;
 import edu.bbte.replate.model.UserDetailsImpl;
 import edu.bbte.replate.model.UserRole;
@@ -9,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,18 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
-    public User register(User user) {
-        log.info("Attempting to register new user with name: {}", user.getUsername());
+    public User register(RegisterDto registerDto) {
+        log.info("Attempting to register new user with name: {}", registerDto.username());
+
+        User user = userMapper.registerDtoToUser(registerDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getRoles().add(UserRole.ROLE_USER);
         return userRepository.saveAndFlush(user);

@@ -7,7 +7,7 @@ import lombok.ToString;
 import org.jspecify.annotations.NonNull;
 
 import java.sql.Date;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public class User extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_id")
     )
     @Column(name = "role")
-    private Set<UserRole> roles = new HashSet<>();
+    private Set<UserRole> roles = EnumSet.noneOf(UserRole.class);
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Listing> listings;
