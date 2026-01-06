@@ -1,6 +1,7 @@
 package edu.bbte.replate.dto.incoming;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record RegisterDto(
@@ -18,5 +19,9 @@ public record RegisterDto(
 
         @NotBlank
         @Size(min = 1, max = 64)
-        String repeatPassword
+        String repeatPassword,
+
+        @NotBlank
+        @Size(max = 13)
+        String phoneNumber
 ) {}

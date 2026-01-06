@@ -10,7 +10,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "joinDate", ignore = true)
     @Mapping(target = "listings", ignore = true)
     User registerDtoToUser(RegisterDto registerDto);

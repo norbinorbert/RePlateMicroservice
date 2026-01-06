@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         log.info("Attempting to register new user with name: {}", registerDto.username());
 
         User user = userMapper.registerDtoToUser(registerDto);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(registerDto.password()));
         user.getRoles().add(UserRole.ROLE_USER);
         return userRepository.saveAndFlush(user);
     }
