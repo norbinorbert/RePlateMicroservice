@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -49,5 +50,6 @@ public class Listing extends BaseEntity {
     @PrePersist
     private void onCreate() {
         datePosted = new Timestamp(System.currentTimeMillis());
+        images = new ArrayList<>();
     }
 }

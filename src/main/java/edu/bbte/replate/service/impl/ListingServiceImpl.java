@@ -1,9 +1,16 @@
 package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
+import edu.bbte.replate.dto.incoming.ListingCreateDto;
+import edu.bbte.replate.mapper.ListingMapper;
+import edu.bbte.replate.model.Category;
+import edu.bbte.replate.model.City;
 import edu.bbte.replate.model.Listing;
+import edu.bbte.replate.model.User;
 import edu.bbte.replate.repository.ListingRepository;
+import edu.bbte.replate.service.CategoryService;
 import edu.bbte.replate.service.ListingService;
+import edu.bbte.replate.service.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +22,15 @@ import java.util.List;
 public class ListingServiceImpl implements ListingService {
     @Autowired
     private ListingRepository listingRepository;
+
+    @Autowired
+    private LocationService locationService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private ListingMapper listingMapper;
 
     @Override
     public Listing findById(Long id) {
@@ -35,19 +51,29 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public Listing create(Listing listing) {
-        log.info("Attempting to create listing: {}", listing);
+    public Listing create(ListingCreateDto dto, User user) {
+        log.info("Attempting to create listing: {}", dto);
+
+        City city = locationService.findCityById(dto.cityId());
+        Category category = categoryService.findById(dto.categoryId());
+
+        Listing listing = listingMapper.createDtoToListing(dto);
+
+        listing.setCity(city);
+        listing.setCategory(category);
+        listing.setOwner(user);
+
         return listingRepository.saveAndFlush(listing);
     }
 
     @Override
-    public void update(Listing listing) {
+    public void update(Listing listing, User user) {
         log.info("Attempting to update listing: {}", listing);
         listingRepository.saveAndFlush(listing);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, User user) {
         log.info("Attempting to delete listing with id: {}", id);
         listingRepository.deleteById(id);
     }
