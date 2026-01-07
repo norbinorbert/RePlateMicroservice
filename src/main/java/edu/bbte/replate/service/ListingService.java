@@ -14,9 +14,9 @@ public interface ListingService {
 
     List<Listing> findByFilters(FilterCriteria filters);
 
-    Listing create(ListingCreateDto createDto, User user);
+    Listing create(Listing listing);
 
-    void update(Listing listing, User user);
+    void update(Listing listing);
 
-    void delete(Long id, User user);
+    void delete(Long id);
 }

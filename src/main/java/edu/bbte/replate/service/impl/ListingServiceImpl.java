@@ -51,29 +51,19 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public Listing create(ListingCreateDto dto, User user) {
-        log.info("Attempting to create listing: {}", dto);
-
-        City city = locationService.findCityById(dto.cityId());
-        Category category = categoryService.findById(dto.categoryId());
-
-        Listing listing = listingMapper.createDtoToListing(dto);
-
-        listing.setCity(city);
-        listing.setCategory(category);
-        listing.setOwner(user);
-
+    public Listing create(Listing listing) {
+        log.info("Attempting to create listing: {}", listing);
         return listingRepository.saveAndFlush(listing);
     }
 
     @Override
-    public void update(Listing listing, User user) {
+    public void update(Listing listing) {
         log.info("Attempting to update listing: {}", listing);
         listingRepository.saveAndFlush(listing);
     }
 
     @Override
-    public void delete(Long id, User user) {
+    public void delete(Long id) {
         log.info("Attempting to delete listing with id: {}", id);
         listingRepository.deleteById(id);
     }
