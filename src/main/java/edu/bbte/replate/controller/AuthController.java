@@ -2,6 +2,8 @@ package edu.bbte.replate.controller;
 
 import edu.bbte.replate.dto.incoming.LoginDto;
 import edu.bbte.replate.dto.incoming.RegisterDto;
+import edu.bbte.replate.exception.BadRequestException;
+import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.model.User;
 import edu.bbte.replate.service.JwtService;
 import edu.bbte.replate.service.UserService;
@@ -42,9 +44,7 @@ public class AuthController {
         // Equal passwords check
         if (!registerDto.password().equals(registerDto.repeatPassword())) {
             log.warn("Provided passwords do not match for registration.");
-
-            responseBody.put("Message", "Provided passwords do not match.");
-            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Provided passwords do not match.");
         }
 
         // Existing username check
@@ -70,9 +70,7 @@ public class AuthController {
             return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("Unexpected error occurred while handling POST /auth/register request: {}", e.getMessage());
-            responseBody.put("Message", "An internal server error has occurred.");
-            responseBody.put("Details", e.getMessage());
-            return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InternalServerErrorException("An internal server error occurred.");
         }
     }
 
@@ -97,14 +95,11 @@ public class AuthController {
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
             } else {
                 log.warn("User login failed");
-                responseBody.put("Message", "Login failed.");
-                responseBody.put("Details", "Invalid username or password.");
-                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+                throw new BadRequestException("Invalid username or password.");
             }
         } catch (AuthenticationException e) {
-            responseBody.put("Message", "An internal server error has occurred.");
-            responseBody.put("Details", e.getMessage());
-            return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Unexpected error occurred while handling POST /auth/login request: {}", e.getMessage());
+            throw new InternalServerErrorException("An internal server error occurred.");
         }
     }
 }

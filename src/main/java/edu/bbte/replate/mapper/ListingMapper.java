@@ -8,7 +8,7 @@ import edu.bbte.replate.model.Listing;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CityMapper.class)
 public interface ListingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "city", ignore = true)
@@ -18,9 +18,16 @@ public interface ListingMapper {
     @Mapping(target = "datePosted", ignore = true)
     Listing createDtoToListing(ListingCreateDto dto);
 
-    Listing updatedtoToListing(ListingUpdateDto dto);
+    @Mapping(target = "city", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "images", ignore = true)
+    @Mapping(target = "datePosted", ignore = true)
+    Listing updateDtoToListing(ListingUpdateDto dto);
 
+    @Mapping(target = "ownerId", source = "owner.id")
     ListingSimpleOutDto listingToSimpleOutDto(Listing listing);
 
+    @Mapping(target = "ownerId", source = "owner.id")
     ListingDetailedOutDto listingToDetailedOutDto(Listing listing);
 }

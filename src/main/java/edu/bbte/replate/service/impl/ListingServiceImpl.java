@@ -2,6 +2,7 @@ package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
 import edu.bbte.replate.dto.incoming.ListingCreateDto;
+import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.mapper.ListingMapper;
 import edu.bbte.replate.model.Category;
 import edu.bbte.replate.model.City;
@@ -65,6 +66,9 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public void delete(Long id) {
         log.info("Attempting to delete listing with id: {}", id);
+        listingRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Listing with id " + id + " not found.")
+        );
         listingRepository.deleteById(id);
     }
 }
