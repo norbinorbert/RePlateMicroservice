@@ -1,13 +1,9 @@
 package edu.bbte.replate.service;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
-import edu.bbte.replate.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.model.Listing;
-import edu.bbte.replate.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ListingService {
     Listing findById(Long id);

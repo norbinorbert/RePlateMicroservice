@@ -14,22 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @Slf4j
 public class ListingServiceImpl implements ListingService {
     @Autowired
     private ListingRepository listingRepository;
-
-    @Autowired
-    private LocationService locationService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private ListingMapper listingMapper;
 
     @Override
     public Listing findById(Long id) {
