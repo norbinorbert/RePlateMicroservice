@@ -1,5 +1,6 @@
 package edu.bbte.replate.controlleradvice;
 
+import edu.bbte.replate.exception.BadRequestException;
 import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,16 @@ public class GlobalExceptionHandler {
         e.getBindingResult().getFieldErrors()
                 .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException e) {
+        log.warn("BadRequestException occurred: {}", e.getMessage());
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("Message", e.getMessage());
+        return ResponseEntity.badRequest().body(responseBody);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
