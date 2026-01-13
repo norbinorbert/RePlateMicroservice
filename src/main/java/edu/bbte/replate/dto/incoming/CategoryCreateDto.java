@@ -5,11 +5,10 @@ import jakarta.validation.constraints.Size;
 import org.jspecify.annotations.NonNull;
 
 public record CategoryCreateDto(
-        @NotBlank
-        @Size(max = 63)
+        @NotBlank(message = "Name cannot be empty.")
+        @Size(max = 63, message = "Name must have a maximum of 63 characters.")
         String name,
 
-        @NonNull
         Long parentCategoryId
 ) {
 }

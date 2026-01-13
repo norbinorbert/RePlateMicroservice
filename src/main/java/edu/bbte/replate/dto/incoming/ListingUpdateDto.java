@@ -9,21 +9,21 @@ public record ListingUpdateDto(
         @NotNull
         Long id,
 
-        @NotBlank
+        @NotBlank(message = "Title cannot be empty.")
         @Size(min = 1, max = 100)
         String title,
 
-        @Size(max = 1000)
+        @Size(max = 1000, message = "Description must have a maximum of 1000 characters.")
         String description,
 
         @NotNull
-        @PositiveOrZero
+        @PositiveOrZero(message = "Price must be greater or equal than 0.")
         double price,
 
         @NotNull
         long cityId,
 
-        @Size(max = 100)
+        @Size(max = 100, message = "LocationDetails must have a maximum of 100 characters.")
         String locationDetails,
 
         @NotNull

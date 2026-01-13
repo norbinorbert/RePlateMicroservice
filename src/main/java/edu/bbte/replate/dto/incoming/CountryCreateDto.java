@@ -8,8 +8,8 @@ public record CountryCreateDto(
         @NonNull
         Long id,
 
-        @NotBlank
-        @Size(max = 63)
+        @NotBlank(message = "Name cannot be empty.")
+        @Size(max = 63, message = "Name must have a maximum of 63 characters.")
         String name
 ) {
 }

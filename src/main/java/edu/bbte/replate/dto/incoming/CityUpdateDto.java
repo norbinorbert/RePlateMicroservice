@@ -7,7 +7,7 @@ public record CityUpdateDto(
         @NonNull
         Long id,
 
-        @NotBlank
+        @NotBlank(message = "Name cannot be empty.")
         String name,
 
         @NonNull
