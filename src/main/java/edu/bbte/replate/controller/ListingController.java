@@ -32,9 +32,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/listings")
@@ -63,8 +63,6 @@ public class ListingController {
     ) {
         log.info("Handling POST /listings request.");
 
-        Map<String, String> responseBody = new HashMap<>();
-
         City city = locationService.findCityById(dto.cityId());
         if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
@@ -88,6 +86,7 @@ public class ListingController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(createdUri);
 
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", "New listing created successfully.");
 
         return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.CREATED);
@@ -130,7 +129,7 @@ public class ListingController {
         }
 
         List<ListingSimpleOutDto> outDtos = listings.stream()
-                .map(l -> listingMapper.listingToSimpleOutDto(l))
+                .map(listingMapper::listingToSimpleOutDto)
                 .toList();
 
         return new ResponseEntity<>(outDtos, HttpStatus.OK);
@@ -171,7 +170,7 @@ public class ListingController {
         listing.setOwner(user);
 
         listingService.update(listing);
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", "Listing updated successfully.");
         return ResponseEntity.ok(responseBody);
     }
@@ -181,7 +180,7 @@ public class ListingController {
     @PreAuthorize("@listingSecurity.isOwner(#id)")
     public ResponseEntity<Map<String, String>> handleDelete(@PathVariable long id) {
         log.info("Handling DELETE /listings/{} request.", id);
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         listingService.delete(id);
 

@@ -1,6 +1,5 @@
 package edu.bbte.replate.utils;
 
-import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.model.Listing;
 import edu.bbte.replate.model.UserDetailsImpl;
 import edu.bbte.replate.service.ListingService;

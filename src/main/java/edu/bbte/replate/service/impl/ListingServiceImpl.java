@@ -2,12 +2,9 @@ package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
 import edu.bbte.replate.exception.ResourceNotFoundException;
-import edu.bbte.replate.mapper.ListingMapper;
 import edu.bbte.replate.model.Listing;
 import edu.bbte.replate.repository.ListingRepository;
-import edu.bbte.replate.service.CategoryService;
 import edu.bbte.replate.service.ListingService;
-import edu.bbte.replate.service.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

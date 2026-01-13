@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestControllerAdvice
 @Slf4j
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException occurred : {}", e.getMessage());
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors = new ConcurrentHashMap<>();
         e.getBindingResult().getFieldErrors()
                 .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException e) {
         log.warn("BadRequestException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", e.getMessage());
         return ResponseEntity.badRequest().body(responseBody);
     }
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException e) {
         log.warn("ResourceNotFoundException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", e.getMessage());
         return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
     }
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
         log.warn("AccessDeniedException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", e.getMessage());
         return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
     }
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
             InternalServerErrorException e
     ) {
         log.error("Internal server error occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
         responseBody.put("Message", "An internal server error occurred.");
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }

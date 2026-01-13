@@ -18,8 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> handleRegister(@RequestBody @Valid RegisterDto registerDto) {
         log.info("Handling POST /auth/register request with username '{}'", registerDto.username());
 
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         // Equal passwords check
         if (!registerDto.password().equals(registerDto.repeatPassword())) {
@@ -58,20 +58,15 @@ public class AuthController {
             return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
         }
 
-        try {
-            User savedUser = userService.register(registerDto);
-            log.info(
-                    "Successfully created new user with username '{}', Id: {}",
-                    savedUser.getUsername(),
-                    savedUser.getId());
+        User savedUser = userService.register(registerDto);
+        log.info(
+                "Successfully created new user with username '{}', Id: {}",
+                savedUser.getUsername(),
+                savedUser.getId());
 
-            // Do not send location after user registration
-            responseBody.put("Message", "User registered successfully.");
-            return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.error("Unexpected error occurred while handling POST /auth/register request: {}", e.getMessage());
-            throw new InternalServerErrorException("An internal server error occurred.");
-        }
+        // Do not send location after user registration
+        responseBody.put("Message", "User registered successfully.");
+        return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -79,7 +74,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> handleLogin(@RequestBody @Valid LoginDto loginDto) {
         log.info("Handling POST /auth/login request with username '{}'", loginDto.username());
 
-        Map<String, String> responseBody = new HashMap<>();
+        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         try {
             Authentication authentication = authenticationManager.authenticate(
