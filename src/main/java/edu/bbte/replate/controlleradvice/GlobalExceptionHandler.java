@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
         log.warn("ResourceNotFoundException occurred: {}", e.getMessage());
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("Message", e.getMessage());
-        return ResponseEntity.badRequest().body(responseBody);
+        return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
