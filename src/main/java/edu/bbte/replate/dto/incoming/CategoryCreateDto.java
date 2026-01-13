@@ -2,7 +2,6 @@ package edu.bbte.replate.dto.incoming;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.jspecify.annotations.NonNull;
 
 public record CategoryCreateDto(
         @NotBlank(message = "Name cannot be empty.")
