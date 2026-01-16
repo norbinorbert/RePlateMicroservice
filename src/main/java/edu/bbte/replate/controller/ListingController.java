@@ -126,15 +126,15 @@ public class    ListingController {
             listings = listingService.findByFilters(filterCriteria, pageable);
         }
 
-        List<ListingSimpleOutDto> outDtos = listings.stream()
-                .map(listingMapper::listingToSimpleOutDto)
-                .toList();
-
         // Return number of page and total number of pages in header
         HttpHeaders headers = new HttpHeaders();
         headers.add("page", String.valueOf(listings.getNumber()));
         headers.add("per_pages", String.valueOf(listings.getNumberOfElements()));
         headers.add("total_pages", String.valueOf(listings.getTotalPages()));
+
+        List<ListingSimpleOutDto> outDtos = listings.stream()
+                .map(listingMapper::listingToSimpleOutDto)
+                .toList();
 
         return new ResponseEntity<>(outDtos, headers, HttpStatus.OK);
     }
