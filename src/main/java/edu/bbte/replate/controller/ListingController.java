@@ -111,7 +111,7 @@ public class ListingController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ListingSimpleOutDto>> handleGetAll(
-            @RequestBody(required = false) @Valid FilterCriteria filterCriteria,
+            @ModelAttribute @Valid FilterCriteria filterCriteria,
             @PageableDefault(
                     size = 20,
                     sort = "datePosted",
