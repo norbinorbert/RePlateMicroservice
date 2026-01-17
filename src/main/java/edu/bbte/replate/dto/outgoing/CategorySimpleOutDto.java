@@ -1,6 +1,6 @@
 package edu.bbte.replate.dto.outgoing;
 
-public record CategoryOutDto(
+public record CategorySimpleOutDto(
         Long id,
         String name,
         Long parentCategoryId

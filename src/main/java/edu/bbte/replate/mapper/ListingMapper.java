@@ -8,7 +8,7 @@ import edu.bbte.replate.model.Listing;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = CityMapper.class)
+@Mapper(componentModel = "spring", uses = {CityMapper.class, CategoryMapper.class})
 public interface ListingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "city", ignore = true)

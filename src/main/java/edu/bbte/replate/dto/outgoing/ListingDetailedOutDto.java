@@ -11,7 +11,7 @@ public record ListingDetailedOutDto(
         Timestamp datePosted,
         CityOutDto city,
         String locationDetails,
-        CategoryOutDto category,
+        CategorySimpleOutDto category,
         Long ownerId,
         List<ImageOutDto> images
 ) {

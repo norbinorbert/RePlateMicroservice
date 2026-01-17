@@ -10,7 +10,7 @@ public record ListingSimpleOutDto(
         Timestamp datePosted,
         CityOutDto city,
         String locationDetails,
-        CategoryOutDto category,
+        CategorySimpleOutDto category,
         Long ownerId
 ) {
 }
