@@ -30,11 +30,7 @@ public class SecurityConfig {
 
                         // Public GET access
                         .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
-
-                        // Restrict write access to authenticated users
-                        .requestMatchers(HttpMethod.POST, "/listings/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/listings/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/listings/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole(UserDetailsImpl.ADMIN_AUTHORITY_NAME)
