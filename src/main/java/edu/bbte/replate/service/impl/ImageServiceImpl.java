@@ -112,7 +112,7 @@ public class ImageServiceImpl implements ImageService  {
         }
 
         if (file.getContentType() == null && !file.getContentType().startsWith("image/")) {
-            throw new IllegalArgumentException("Provided image type files are allowed.");
+            throw new IllegalArgumentException("Only image type files are allowed.");
         }
     }
 
