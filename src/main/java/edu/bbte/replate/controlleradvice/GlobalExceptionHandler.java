@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<SimpleMessageResponseDto> handleResourceNotFound(ResourceNotFoundException e) {
         log.warn("ResourceNotFoundException occurred: {}", e.getMessage());
         var responseBody = new SimpleMessageResponseDto(e.getMessage());

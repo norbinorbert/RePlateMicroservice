@@ -31,6 +31,7 @@ public class SecurityConfig {
                         // Public GET access
                         .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/locations/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole(UserDetailsImpl.ADMIN_AUTHORITY_NAME)
