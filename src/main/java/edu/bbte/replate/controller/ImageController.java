@@ -1,5 +1,6 @@
 package edu.bbte.replate.controller;
 
+import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
 import edu.bbte.replate.dto.outgoing.ImageOutDto;
 import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
 import edu.bbte.replate.mapper.ImageMapper;
@@ -7,6 +8,7 @@ import edu.bbte.replate.model.Image;
 import edu.bbte.replate.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,6 +48,22 @@ public class ImageController {
         var responseBody = new SimpleMessageResponseDto("New image uploaded successfully.");
 
         return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{imageId}/download")
+    public ResponseEntity<Resource> handleDownloadImage(
+            @PathVariable long listingId,
+            @PathVariable long imageId
+    ) {
+        ImageDownloadDto downloadDto = imageService.download(listingId, imageId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(downloadDto.mimeType()))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + downloadDto.fileName() + "\""
+                )
+                .body(downloadDto.resource());
     }
 
     @GetMapping

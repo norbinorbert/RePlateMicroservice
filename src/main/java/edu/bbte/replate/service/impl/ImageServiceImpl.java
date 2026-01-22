@@ -1,5 +1,6 @@
 package edu.bbte.replate.service.impl;
 
+import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
 import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.model.Image;
@@ -10,10 +11,14 @@ import edu.bbte.replate.service.ListingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -22,6 +27,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@Transactional
 public class ImageServiceImpl implements ImageService  {
     @Autowired
     private ImageRepository imageRepository;
@@ -89,10 +95,41 @@ public class ImageServiceImpl implements ImageService  {
     }
 
     @Override
+    public ImageDownloadDto download(Long listingId, Long imageId) {
+        Listing listing = getListingOrElseThrow(listingId);
+
+        Image image = listing.getImages()
+                .stream()
+                .filter(i -> i.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));
+
+        Path path = Path.of(image.getFilePath());
+
+        if (!Files.exists(path)) {
+            log.error("Image file for image with id {} is missing.", imageId);
+            throw new InternalServerErrorException("Image file is missing");
+        }
+
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            return new ImageDownloadDto(
+                    resource,
+                    image.getImageName(),
+                    image.getImageMimeType()
+            );
+        } catch (MalformedURLException e) {
+            log.error("Invalid image path: {}", e.getMessage());
+            throw new InternalServerErrorException("Invalid image path.");
+        }
+    }
+
+    @Override
     public void delete(Long listingId, Long imageId) {
         Listing listing = getListingOrElseThrow(listingId);
 
-        Image image = listing.getImages().stream()
+        Image image = listing.getImages()
+                .stream()
                 .filter(i -> i.getId().equals(imageId))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));

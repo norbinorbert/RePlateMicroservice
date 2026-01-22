@@ -1,5 +1,6 @@
 package edu.bbte.replate.service;
 
+import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
 import edu.bbte.replate.model.Image;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,8 @@ public interface ImageService {
     List<Image> findImagesByListingId(Long listingId);
 
     Image upload(Long listingId, MultipartFile file);
+
+    ImageDownloadDto download(Long listingId, Long imageId);
 
     void delete(Long listingId, Long imageId);
 }
