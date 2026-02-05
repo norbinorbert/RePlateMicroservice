@@ -3,9 +3,7 @@ package edu.bbte.replate.repository;
 import edu.bbte.replate.dto.incoming.FilterCriteria;
 import edu.bbte.replate.model.Category;
 import edu.bbte.replate.model.Listing;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,8 +36,7 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
             // Filter by category
             if (filterCriteria.getCategoryName() != null) {
-                Predicate categoryPredicate = buildCategoryPredicateRecursive(root.get("category"), cb,
-                        filterCriteria.getCategoryName(), 0, 5);
+                Predicate categoryPredicate = buildCategoryPredicate(root, cb, filterCriteria.getCategoryName());
                 predicates.add(categoryPredicate);
             }
 
@@ -72,25 +69,27 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
         return cb.and(locationPredicates.toArray(new Predicate[0]));
     }
 
-    // Helper method to build recursive category predicate (basically filtering by category and its ancestors)
+    // Helper method to build category predicate (basically filtering by category and its ancestors)
     // example: if filtering by "Electronics", also include listings in "Mobile Phones" if
     // "Mobile Phones" is a subcategory of "Electronics"
-    private Predicate buildCategoryPredicateRecursive(Path<Category> categoryPath, CriteriaBuilder cb,
-                                                      String targetCategoryName, int currentDepth, int maxDepth) {
-        if (currentDepth > maxDepth) {
-            return cb.disjunction(); // Return false predicate if max depth exceeded
-        }
+    private Predicate buildCategoryPredicate(Root<Listing> root,
+                                             CriteriaBuilder cb,
+                                             String categoryName) {
 
-        // Check if current category matches the name
-        Predicate currentMatch = cb.equal(categoryPath.get("name"), targetCategoryName);
+        Join<Listing, Category> c0 = root.join("category", JoinType.LEFT);
+        Join<Category, Category> c1 = c0.join("parentCategory", JoinType.LEFT);
+        Join<Category, Category> c2 = c1.join("parentCategory", JoinType.LEFT);
+        Join<Category, Category> c3 = c2.join("parentCategory", JoinType.LEFT);
+        Join<Category, Category> c4 = c3.join("parentCategory", JoinType.LEFT);
+        Join<Category, Category> c5 = c4.join("parentCategory", JoinType.LEFT);
 
-        // Check parents recursively (basically checking if any ancestor matches the target category)
-        // example: we are filtering by "Electronics", and currently the SQL query is at the category "Mobile Phones",
-        // the query checks if "Mobile Phones"'s parent (or grandparent etc.) is "Electronics"
-        Path<Category> parentPath = categoryPath.get("parentCategory");
-        Predicate parentMatch = buildCategoryPredicateRecursive(parentPath, cb, targetCategoryName,
-                currentDepth + 1, maxDepth);
-
-        return cb.or(currentMatch, parentMatch);
+        return cb.or(
+                cb.equal(c0.get("name"), categoryName),
+                cb.equal(c1.get("name"), categoryName),
+                cb.equal(c2.get("name"), categoryName),
+                cb.equal(c3.get("name"), categoryName),
+                cb.equal(c4.get("name"), categoryName),
+                cb.equal(c5.get("name"), categoryName)
+        );
     }
 }

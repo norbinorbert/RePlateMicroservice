@@ -87,7 +87,8 @@ public class AuthController {
             if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(authentication);
                 log.info("User login is successful.");
-                var responseBody = new LoginResponseDto("Login successful.", token);
+                var responseBody = new LoginResponseDto("Login successful.", token,
+                        userService.findByUsername(loginDto.username()).getId());
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
             } else {
                 log.warn("User login failed");

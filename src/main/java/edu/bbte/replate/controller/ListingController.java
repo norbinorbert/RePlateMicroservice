@@ -165,6 +165,7 @@ public class    ListingController {
         Listing listing = listingMapper.updateDtoToListing(dto);
         listing.setCity(city);
         listing.setCategory(category);
+        listing.setImages(listingService.findById(listing.getId()).getImages());
         User user = userService.findByUsername(principal.getUsername());
         listing.setOwner(user);
 
