@@ -47,13 +47,13 @@ services:
     networks:
       - replate-network
 
-  location-service:
+  filter-service:
     build:
       context: .
-      dockerfile: location-service/Dockerfile
-    container_name: replate-location-service
+      dockerfile: filter-service/Dockerfile
+    container_name: replate-filter-service
     ports:
-      - "${LOCATION_SERVICE_PORT:-8083}:8083"
+      - "${FILTER_SERVICE_PORT:-8083}:8083"
     environment:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
@@ -91,7 +91,7 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_healthy
-      location-service:
+      filter-service:
         condition: service_healthy
     volumes:
       - uploads:/app/uploads

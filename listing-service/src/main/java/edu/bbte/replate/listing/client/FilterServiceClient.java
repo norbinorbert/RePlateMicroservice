@@ -10,17 +10,17 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
-public class LocationServiceClient {
+public class FilterServiceClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${location.service.url:http://location-service}")
-    private String locationServiceUrl;
+    @Value("${filter.service.url:http://filter-service}")
+    private String filterServiceUrl;
 
     public CityWithParentCountyOutDto getCityById(Long cityId) {
         log.info("Fetching city with id: {}", cityId);
         try {
-            String url = locationServiceUrl + "/locations/cities/" + cityId;
+            String url = filterServiceUrl + "/locations/cities/" + cityId;
             return restTemplate.getForObject(url, CityWithParentCountyOutDto.class);
         } catch (Exception e) {
             log.error("Failed to fetch city with id: {}", cityId, e);
@@ -31,7 +31,7 @@ public class LocationServiceClient {
     public CategorySimpleOutDto getCategoryById(Long categoryId) {
         log.info("Fetching category with id: {}", categoryId);
         try {
-            String url = locationServiceUrl + "/categories/" + categoryId;
+            String url = filterServiceUrl + "/categories/" + categoryId;
             return restTemplate.getForObject(url, CategorySimpleOutDto.class);
         } catch (Exception e) {
             log.error("Failed to fetch category with id: {}", categoryId, e);

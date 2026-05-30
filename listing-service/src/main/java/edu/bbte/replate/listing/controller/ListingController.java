@@ -1,7 +1,7 @@
 package edu.bbte.replate.listing.controller;
 
 import edu.bbte.replate.listing.client.AuthServiceClient;
-import edu.bbte.replate.listing.client.LocationServiceClient;
+import edu.bbte.replate.listing.client.FilterServiceClient;
 import edu.bbte.replate.listing.mapper.ListingMapper;
 import edu.bbte.replate.listing.model.Listing;
 import edu.bbte.replate.listing.service.ListingService;
@@ -40,7 +40,7 @@ public class ListingController {
     private ListingService listingService;
 
     @Autowired
-    private LocationServiceClient locationServiceClient;
+    private FilterServiceClient locationServiceClient;
 
     @Autowired
     private AuthServiceClient authServiceClient;

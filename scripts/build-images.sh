@@ -21,8 +21,8 @@ echo "📦 Building Listing Service..."
 docker build -f listing-service/Dockerfile -t "${REGISTRY}"/listing-service:"${VERSION}" .
 
 echo ""
-echo "📦 Building Location Service..."
-docker build -f location-service/Dockerfile -t "${REGISTRY}"/location-service:"${VERSION}" .
+echo "📦 Building Filter Service..."
+docker build -f filter-service/Dockerfile -t "${REGISTRY}"/filter-service:"${VERSION}" .
 
 echo ""
 echo "✅ All images built successfully!"

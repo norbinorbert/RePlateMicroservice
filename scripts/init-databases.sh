@@ -23,13 +23,13 @@ CREATE DATABASE IF NOT EXISTS replate_auth CHARACTER SET utf8mb4 COLLATE utf8mb4
 -- Create listing database
 CREATE DATABASE IF NOT EXISTS replate_listings CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Create location database
-CREATE DATABASE IF NOT EXISTS replate_locations CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Create Filter database
+CREATE DATABASE IF NOT EXISTS replate_filters CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Grant permissions
 GRANT ALL PRIVILEGES ON replate_auth.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON replate_listings.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON replate_locations.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON replate_filters.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 
 FLUSH PRIVILEGES;
 

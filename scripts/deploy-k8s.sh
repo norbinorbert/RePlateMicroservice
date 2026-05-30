@@ -47,15 +47,15 @@ echo "📝 Deploying Listing Service..."
 kubectl apply -f k8s/listing-service.yaml
 
 echo ""
-echo "📍 Deploying Location Service..."
-kubectl apply -f k8s/location-service.yaml
+echo "📍 Deploying Filter Service..."
+kubectl apply -f k8s/filter-service.yaml
 
 # Wait for all deployments
 echo ""
 echo "⏳ Waiting for all services to be ready..."
 kubectl rollout status deployment/auth-service -n "$NAMESPACE" --timeout=5m
 kubectl rollout status deployment/listing-service -n "$NAMESPACE" --timeout=5m
-kubectl rollout status deployment/location-service -n "$NAMESPACE" --timeout=5m
+kubectl rollout status deployment/filter-service -n "$NAMESPACE" --timeout=5m
 
 # Show status
 echo ""
@@ -78,7 +78,7 @@ echo "1. Update /etc/hosts with ingress IPs"
 echo "2. Access services:"
 echo "   - Auth: http://api.replate.local/auth"
 echo "   - Listings: http://api.replate.local/listings"
-echo "   - Locations: http://internal-api.replate.local/locations (internal only)"
+echo "   - Filters: http://internal-api.replate.local/filters (internal only)"
 echo ""
 echo "3. View logs:"
 echo "   kubectl logs -n $NAMESPACE deployment/auth-service -f"
