@@ -5,6 +5,7 @@ import edu.bbte.replate.auth.service.JwtService;
 import edu.bbte.replate.auth.service.UserService;
 import edu.bbte.replate.shared.dto.incoming.LoginDto;
 import edu.bbte.replate.shared.dto.incoming.RegisterDto;
+import edu.bbte.replate.shared.dto.internal.UserInfoDto;
 import edu.bbte.replate.shared.dto.outgoing.LoginResponseDto;
 import edu.bbte.replate.shared.dto.outgoing.SimpleMessageResponseDto;
 import edu.bbte.replate.shared.exception.BadRequestException;
@@ -98,5 +99,19 @@ public class AuthController {
             log.error("Unexpected error occurred while handling POST /auth/login request: {}", e.getMessage());
             throw new InternalServerErrorException("An internal server error occurred.");
         }
+    }
+
+    @GetMapping("/user/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<UserInfoDto> handleGetUserByUsername(@PathVariable String username) {
+        log.info("Handling GET /auth/user/{} request.", username);
+
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            throw new BadRequestException("User with username '" + username + "' not found.");
+        }
+
+        UserInfoDto userInfo = new UserInfoDto(user.getId(), user.getUsername(), user.getEmail());
+        return ResponseEntity.ok(userInfo);
     }
 }

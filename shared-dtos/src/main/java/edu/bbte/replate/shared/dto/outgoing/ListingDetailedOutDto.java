@@ -9,9 +9,11 @@ public record ListingDetailedOutDto(
         String description,
         Double price,
         Timestamp datePosted,
-        CityWithParentCountyOutDto city,
+        Long cityId,
+        Long countyId,
+        Long countryId,
         String locationDetails,
-        CategorySimpleOutDto category,
+        Long categoryId,
         Long ownerId,
         List<ImageOutDto> images
 ) {

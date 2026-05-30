@@ -1,5 +1,7 @@
 package edu.bbte.replate.listing.controller;
 
+import edu.bbte.replate.listing.client.AuthServiceClient;
+import edu.bbte.replate.listing.client.LocationServiceClient;
 import edu.bbte.replate.listing.mapper.ListingMapper;
 import edu.bbte.replate.listing.model.Listing;
 import edu.bbte.replate.listing.service.ListingService;
@@ -37,13 +39,10 @@ public class ListingController {
     private ListingService listingService;
 
     @Autowired
-    private LocationService locationService;
+    private LocationServiceClient locationServiceClient;
 
     @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private UserService userService;
+    private AuthServiceClient authServiceClient;
 
     @Autowired
     private ListingMapper listingMapper;
@@ -56,21 +55,27 @@ public class ListingController {
     ) {
         log.info("Handling POST /listings request.");
 
-        City city = locationService.findCityById(dto.cityId());
-        if (city == null) {
+        // Validate city exists in location service
+        if (locationServiceClient.getCityById(dto.cityId()) == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
-        Category category = categoryService.findById(dto.categoryId());
-        if (category == null) {
+        // Validate category exists in location service
+        if (locationServiceClient.getCategoryById(dto.categoryId()) == null) {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 
+        // Get user ID from auth service
+        Long userId = authServiceClient.getUserIdByUsername(principal.getUsername());
+        if (userId == null) {
+            throw new BadRequestException("User not found: " + principal.getUsername());
+        }
+
         Listing listing = listingMapper.createDtoToListing(dto);
-        listing.setCity(city);
-        listing.setCategory(category);
-        User user = userService.findByUsername(principal.getUsername());
-        listing.setOwner(user);
+        listing.setCityId(dto.cityId());
+        // TODO: set county and country id based on city id
+        listing.setCategoryId(dto.categoryId());
+        listing.setOwnerId(userId);
 
         Listing createdListing = listingService.create(listing);
 
@@ -114,7 +119,7 @@ public class ListingController {
 
         Page<Listing> listings;
 
-        if (filterCriteria == null || !isAnyFilterCriterionSet(filterCriteria)) {
+        if (!isAnyFilterCriterionSet(filterCriteria)) {
             listings = listingService.findAll(pageable);
         } else {
             listings = listingService.findByFilters(filterCriteria, pageable);
@@ -146,22 +151,33 @@ public class ListingController {
             throw new BadRequestException("Id mismatch between URL and body.");
         }
 
-        City city = locationService.findCityById(dto.cityId());
-        if (city == null) {
+        // Validate city exists
+        if (locationServiceClient.getCityById(dto.cityId()) == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
-        Category category = categoryService.findById(dto.categoryId());
-        if (category == null) {
+        // Validate category exists
+        if (locationServiceClient.getCategoryById(dto.categoryId()) == null) {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 
+        // Get user ID from auth service
+        Long userId = authServiceClient.getUserIdByUsername(principal.getUsername());
+        if (userId == null) {
+            throw new BadRequestException("User not found: " + principal.getUsername());
+        }
+
+        Listing existingListing = listingService.findById(id);
+        if (existingListing == null) {
+            throw new ResourceNotFoundException("Listing with id " + id + " not found.");
+        }
+
         Listing listing = listingMapper.updateDtoToListing(dto);
-        listing.setCity(city);
-        listing.setCategory(category);
-        listing.setImages(listingService.findById(listing.getId()).getImages());
-        User user = userService.findByUsername(principal.getUsername());
-        listing.setOwner(user);
+        listing.setCityId(dto.cityId());
+        // TODO: set county and country id based on city id
+        listing.setCategoryId(dto.categoryId());
+        listing.setOwnerId(userId);
+        listing.setImages(existingListing.getImages());
 
         listingService.update(listing);
         var responseBody = new SimpleMessageResponseDto("Listing updated successfully.");
@@ -181,12 +197,14 @@ public class ListingController {
     }
 
     private boolean isAnyFilterCriterionSet(FilterCriteria filterCriteria) {
-        return (filterCriteria.getTitle() != null && !filterCriteria.getTitle().isEmpty())
-                || filterCriteria.getMinPrice() != null
-                || filterCriteria.getMaxPrice() != null
-                || filterCriteria.getCountryId() != null
-                || filterCriteria.getCountyId() != null
-                || filterCriteria.getCityId() != null
-                || filterCriteria.getCategoryId() != null;
+        return (filterCriteria != null && (
+                (filterCriteria.getTitle() != null && !filterCriteria.getTitle().isEmpty())
+                        || filterCriteria.getMinPrice() != null
+                        || filterCriteria.getMaxPrice() != null
+                        || filterCriteria.getCountryId() != null
+                        || filterCriteria.getCountyId() != null
+                        || filterCriteria.getCityId() != null
+                        || filterCriteria.getCategoryId() != null
+        ));
     }
 }
