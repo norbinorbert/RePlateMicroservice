@@ -144,33 +144,19 @@ public class LocationController {
         return ResponseEntity.ok(outDtos);
     }
 
-    @GetMapping("/countries/{countryId}/counties/{countyId}/cities/{cityId}")
+    @GetMapping("/cities/{cityId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CitySimpleOutDto> handleGetCityById(
-            @PathVariable long countryId,
-            @PathVariable long countyId,
+    public ResponseEntity<CityWithParentCountyOutDto> handleGetCityById(
             @PathVariable long cityId
     ) {
-        log.info("Handling GET /countries/{}/counties/{}/cities/{} request.", countryId, countyId, cityId);
-
-        Country country = locationService.findCountryById(countryId);
-
-        if (country == null) {
-            throw new ResourceNotFoundException("No country with id " + countryId + " was found.");
-        }
-
-        County county = locationService.findCountyById(countyId);
-
-        if (county == null) {
-            throw new ResourceNotFoundException("No county with id " + countyId + " was found.");
-        }
+        log.info("Handling GET /cities/{} request.", cityId);
 
         City city = locationService.findCityById(cityId);
         if (city == null) {
             throw new ResourceNotFoundException("No city with id " + cityId + " was found.");
         }
 
-        CitySimpleOutDto dto = cityMapper.toSimpleOutDto(city);
+        CityWithParentCountyOutDto dto = cityMapper.toWithParentOutDto(city);
 
         return ResponseEntity.ok(dto);
     }

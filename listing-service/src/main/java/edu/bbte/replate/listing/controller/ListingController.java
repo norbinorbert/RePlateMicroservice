@@ -8,6 +8,7 @@ import edu.bbte.replate.listing.service.ListingService;
 import edu.bbte.replate.shared.dto.incoming.FilterCriteria;
 import edu.bbte.replate.shared.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.shared.dto.incoming.ListingUpdateDto;
+import edu.bbte.replate.shared.dto.outgoing.CityWithParentCountyOutDto;
 import edu.bbte.replate.shared.dto.outgoing.ListingDetailedOutDto;
 import edu.bbte.replate.shared.dto.outgoing.ListingSimpleOutDto;
 import edu.bbte.replate.shared.dto.outgoing.SimpleMessageResponseDto;
@@ -55,8 +56,9 @@ public class ListingController {
     ) {
         log.info("Handling POST /listings request.");
 
+        CityWithParentCountyOutDto city = locationServiceClient.getCityById(dto.cityId());
         // Validate city exists in location service
-        if (locationServiceClient.getCityById(dto.cityId()) == null) {
+        if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
@@ -72,8 +74,9 @@ public class ListingController {
         }
 
         Listing listing = listingMapper.createDtoToListing(dto);
-        listing.setCityId(dto.cityId());
-        // TODO: set county and country id based on city id
+        listing.setCityId(city.id());
+        listing.setCountyId(city.county().id());
+        listing.setCountryId(city.county().country().id());
         listing.setCategoryId(dto.categoryId());
         listing.setOwnerId(userId);
 
@@ -151,8 +154,9 @@ public class ListingController {
             throw new BadRequestException("Id mismatch between URL and body.");
         }
 
+        CityWithParentCountyOutDto city = locationServiceClient.getCityById(dto.cityId());
         // Validate city exists
-        if (locationServiceClient.getCityById(dto.cityId()) == null) {
+        if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
@@ -173,8 +177,9 @@ public class ListingController {
         }
 
         Listing listing = listingMapper.updateDtoToListing(dto);
-        listing.setCityId(dto.cityId());
-        // TODO: set county and country id based on city id
+        listing.setCityId(city.id());
+        listing.setCountyId(city.county().id());
+        listing.setCountryId(city.county().country().id());
         listing.setCategoryId(dto.categoryId());
         listing.setOwnerId(userId);
         listing.setImages(existingListing.getImages());

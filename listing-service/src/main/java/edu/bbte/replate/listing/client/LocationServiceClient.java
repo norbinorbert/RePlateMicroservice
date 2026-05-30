@@ -1,7 +1,7 @@
 package edu.bbte.replate.listing.client;
 
 import edu.bbte.replate.shared.dto.outgoing.CategorySimpleOutDto;
-import edu.bbte.replate.shared.dto.outgoing.CitySimpleOutDto;
+import edu.bbte.replate.shared.dto.outgoing.CityWithParentCountyOutDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +17,11 @@ public class LocationServiceClient {
     @Value("${location.service.url:http://location-service}")
     private String locationServiceUrl;
 
-    public CitySimpleOutDto getCityById(Long cityId) {
+    public CityWithParentCountyOutDto getCityById(Long cityId) {
         log.info("Fetching city with id: {}", cityId);
         try {
             String url = locationServiceUrl + "/locations/cities/" + cityId;
-            return restTemplate.getForObject(url, CitySimpleOutDto.class);
+            return restTemplate.getForObject(url, CityWithParentCountyOutDto.class);
         } catch (Exception e) {
             log.error("Failed to fetch city with id: {}", cityId, e);
             return null;
