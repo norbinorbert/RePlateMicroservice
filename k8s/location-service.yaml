@@ -1,0 +1,137 @@
+---
+# Location Service - ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: location-service-config
+  namespace: replate
+data:
+  DATABASE_HOST: "mysql-service"
+  DATABASE_PORT: "3306"
+  DATABASE_USER: "replate_user"
+  SPRING_PROFILES_ACTIVE: "prod"
+
+---
+# Location Service - Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: location-service-secret
+  namespace: replate
+type: Opaque
+stringData:
+  DATABASE_PASSWORD: "changeme"
+
+---
+# Location Service - Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: location-service
+  namespace: replate
+  labels:
+    app: location-service
+    version: v1
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: location-service
+  template:
+    metadata:
+      labels:
+        app: location-service
+        version: v1
+    spec:
+      serviceAccountName: replate-service-account
+      containers:
+      - name: location-service
+        image: replate/location-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8083
+          protocol: TCP
+        env:
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: location-service-config
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: location-service-config
+              key: DATABASE_PORT
+        - name: DATABASE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: location-service-config
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: location-service-secret
+              key: DATABASE_PASSWORD
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: location-service-config
+              key: SPRING_PROFILES_ACTIVE
+        livenessProbe:
+          httpGet:
+            path: /locations/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /locations/health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+---
+# Location Service - Service (Internal ClusterIP only)
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-service
+  namespace: replate
+  labels:
+    app: location-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: location-service
+  sessionAffinity: None
+

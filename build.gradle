@@ -1,73 +1,44 @@
-import org.springframework.boot.gradle.tasks.run.BootRun
-
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '4.0.0'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '4.0.0' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
-apply from: './lint.gradle'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
 
-group = 'edu.bbte'
-version = '0.0.1-SNAPSHOT'
-description = 'RePlate'
+    group = 'edu.bbte'
+    version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
     }
 }
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // JJWT
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
-    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
-
-    // MapStruct
-    // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    // https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-tasks.register('bootRunCreate', BootRun) {
-    group = 'Application'
-
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass.set(tasks.bootRun.mainClass)
-    jvmArgs = ['-Dspring.profiles.active=create']
-}
-

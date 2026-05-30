@@ -1,0 +1,22 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
+description = 'RePlate Location and Taxonomy Service'
+
+dependencies {
+    implementation project(':shared-dtos')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+}
+
+tasks.register('bootRunCreate', BootRun) {
+    group = 'Application'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set('edu.bbte.replate.location.FilterServiceApplication')
+    jvmArgs = ['-Dspring.profiles.active=create']
+}
