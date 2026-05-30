@@ -52,86 +52,86 @@ spec:
     spec:
       serviceAccountName: replate-service-account
       containers:
-      - name: listing-service
-        image: replate/listing-service:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: http
-          containerPort: 8082
-          protocol: TCP
-        env:
-        - name: DATABASE_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: listing-service-config
-              key: DATABASE_HOST
-        - name: DATABASE_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: listing-service-config
-              key: DATABASE_PORT
-        - name: DATABASE_USER
-          valueFrom:
-            configMapKeyRef:
-              name: listing-service-config
-              key: DATABASE_USER
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: listing-service-secret
-              key: DATABASE_PASSWORD
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: listing-service-secret
-              key: JWT_SECRET
-        - name: AUTH_SERVICE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: listing-service-config
-              key: AUTH_SERVICE_URL
-        - name: SPRING_PROFILES_ACTIVE
-          valueFrom:
-            configMapKeyRef:
-              name: listing-service-config
-              key: SPRING_PROFILES_ACTIVE
-        livenessProbe:
-          httpGet:
-            path: /listings/health
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /listings/health
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        volumeMounts:
-        - name: uploads
-          mountPath: /app/uploads
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-            - ALL
+        - name: listing-service
+          image: replate/listing-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8082
+              protocol: TCP
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: listing-service-config
+                  key: DATABASE_HOST
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: listing-service-config
+                  key: DATABASE_PORT
+            - name: DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: listing-service-config
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: listing-service-secret
+                  key: DATABASE_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: listing-service-secret
+                  key: JWT_SECRET
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: listing-service-config
+                  key: AUTH_SERVICE_URL
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: listing-service-config
+                  key: SPRING_PROFILES_ACTIVE
+          livenessProbe:
+            httpGet:
+              path: /listings/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /listings/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
       volumes:
-      - name: uploads
-        emptyDir: {}
+        - name: uploads
+          emptyDir: { }
 
 ---
 # Listing Service - Service
@@ -145,10 +145,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: http
-    protocol: TCP
-    name: http
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
   selector:
     app: listing-service
   sessionAffinity: None

@@ -76,56 +76,56 @@ spec:
         app: mysql
     spec:
       containers:
-      - name: mysql
-        image: mysql:8.0-alpine
-        ports:
-        - containerPort: 3306
-          name: mysql
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_ROOT_PASSWORD
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_USER
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_PASSWORD
-        volumeMounts:
-        - name: mysql-storage
-          mountPath: /var/lib/mysql
-        - name: mysql-config
-          mountPath: /etc/mysql/conf.d
-        livenessProbe:
-          exec:
-            command: ["mysqladmin", "ping", "-h", "localhost"]
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          exec:
-            command: ["mysqladmin", "ping", "-h", "localhost"]
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
+        - name: mysql
+          image: mysql:8.0-alpine
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d
+          livenessProbe:
+            exec:
+              command: [ "mysqladmin", "ping", "-h", "localhost" ]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: [ "mysqladmin", "ping", "-h", "localhost" ]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
       volumes:
-      - name: mysql-storage
-        persistentVolumeClaim:
-          claimName: mysql-pvc
-      - name: mysql-config
-        configMap:
-          name: mysql-config
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: mysql-config
+          configMap:
+            name: mysql-config
 
 ---
 # MySQL Service
@@ -138,8 +138,8 @@ metadata:
     app: mysql
 spec:
   ports:
-  - port: 3306
-    targetPort: 3306
+    - port: 3306
+      targetPort: 3306
   selector:
     app: mysql
   type: ClusterIP

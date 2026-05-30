@@ -21,9 +21,9 @@ metadata:
   name: replate-role
   namespace: replate
 rules:
-- apiGroups: [""]
-  resources: ["configmaps", "secrets"]
-  verbs: ["get", "list"]
+  - apiGroups: [ "" ]
+    resources: [ "configmaps", "secrets" ]
+    verbs: [ "get", "list" ]
 
 ---
 # RoleBinding
@@ -37,9 +37,9 @@ roleRef:
   kind: Role
   name: replate-role
 subjects:
-- kind: ServiceAccount
-  name: replate-service-account
-  namespace: replate
+  - kind: ServiceAccount
+    name: replate-service-account
+    namespace: replate
 
 ---
 # NetworkPolicy - Allow traffic within namespace
@@ -49,28 +49,28 @@ metadata:
   name: replate-network-policy
   namespace: replate
 spec:
-  podSelector: {}
+  podSelector: { }
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: replate
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: replate
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: replate
-  - to:
-    - namespaceSelector: {}
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-    - protocol: UDP
-      port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: replate
+    - to:
+        - namespaceSelector: { }
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
 
 ---
 # Ingress - Route external traffic to Auth and Listing services
@@ -86,63 +86,47 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
 spec:
   tls:
-  - hosts:
-    - api.replate.local
-    secretName: replate-tls-cert
+    - hosts:
+        - api.replate.local
+      secretName: replate-tls-cert
   rules:
-  - host: api.replate.local
-    http:
-      paths:
-      # Auth Service endpoints
-      - path: /auth
-        pathType: Prefix
-        backend:
-          service:
-            name: auth-service
-            port:
-              number: 80
-      # Listing Service endpoints
-      - path: /listings
-        pathType: Prefix
-        backend:
-          service:
-            name: listing-service
-            port:
-              number: 80
-      - path: /images
-        pathType: Prefix
-        backend:
-          service:
-            name: listing-service
-            port:
-              number: 80
-
----
-# Optional: Ingress for internal use (without auth requirement)
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: replate-ingress-internal
-  namespace: replate
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-spec:
-  rules:
-  - host: internal-api.replate.local
-    http:
-      paths:
-      - path: /locations
-        pathType: Prefix
-        backend:
-          service:
-            name: location-service
-            port:
-              number: 80
-      - path: /categories
-        pathType: Prefix
-        backend:
-          service:
-            name: location-service
-            port:
-              number: 80
-
+    - host: api.replate.local
+      http:
+        paths:
+          # Auth Service endpoints
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 80
+          # Listing Service endpoints
+          - path: /listings
+            pathType: Prefix
+            backend:
+              service:
+                name: listing-service
+                port:
+                  number: 80
+          - path: /images
+            pathType: Prefix
+            backend:
+              service:
+                name: listing-service
+                port:
+                  number: 80
+          - path: /locations
+            pathType: Prefix
+            backend:
+              service:
+                name: location-service
+                port:
+                  number: 80
+          - path: /categories
+            pathType: Prefix
+            backend:
+              service:
+                name: location-service
+                port:
+                  number: 80

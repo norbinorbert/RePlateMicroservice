@@ -52,80 +52,80 @@ spec:
     spec:
       serviceAccountName: replate-service-account
       containers:
-      - name: auth-service
-        image: replate/auth-service:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: http
-          containerPort: 8081
-          protocol: TCP
-        env:
-        - name: DATABASE_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: auth-service-config
-              key: DATABASE_HOST
-        - name: DATABASE_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: auth-service-config
-              key: DATABASE_PORT
-        - name: DATABASE_USER
-          valueFrom:
-            configMapKeyRef:
-              name: auth-service-config
-              key: DATABASE_USER
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: auth-service-secret
-              key: DATABASE_PASSWORD
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: auth-service-secret
-              key: JWT_SECRET
-        - name: JWT_EXPIRATION
-          valueFrom:
-            configMapKeyRef:
-              name: auth-service-config
-              key: JWT_EXPIRATION
-        - name: SPRING_PROFILES_ACTIVE
-          valueFrom:
-            configMapKeyRef:
-              name: auth-service-config
-              key: SPRING_PROFILES_ACTIVE
-        livenessProbe:
-          httpGet:
-            path: /auth/health
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /auth/health
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-            - ALL
+        - name: auth-service
+          image: replate/auth-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: DATABASE_HOST
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: DATABASE_PORT
+            - name: DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: auth-service-secret
+                  key: DATABASE_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-service-secret
+                  key: JWT_SECRET
+            - name: JWT_EXPIRATION
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: JWT_EXPIRATION
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: SPRING_PROFILES_ACTIVE
+          livenessProbe:
+            httpGet:
+              path: /auth/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /auth/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
 
 ---
 # Auth Service - Service
@@ -139,10 +139,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: http
-    protocol: TCP
-    name: http
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
   selector:
     app: auth-service
   sessionAffinity: None
