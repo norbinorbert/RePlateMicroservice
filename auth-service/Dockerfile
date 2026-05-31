@@ -8,6 +8,8 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /build/auth-service/build/libs/*.jar app.jar
 
+RUN apk add --no-cache curl
+
 # Create non-root user
 RUN addgroup -g 1000 appuser && adduser -D -u 1000 -G appuser appuser
 USER appuser
