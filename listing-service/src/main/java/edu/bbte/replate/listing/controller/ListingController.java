@@ -8,6 +8,7 @@ import edu.bbte.replate.listing.service.ListingService;
 import edu.bbte.replate.shared.dto.incoming.FilterCriteria;
 import edu.bbte.replate.shared.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.shared.dto.incoming.ListingUpdateDto;
+import edu.bbte.replate.shared.dto.internal.TokenValidationResponseDto;
 import edu.bbte.replate.shared.dto.outgoing.CityWithParentCountyOutDto;
 import edu.bbte.replate.shared.dto.outgoing.ListingDetailedOutDto;
 import edu.bbte.replate.shared.dto.outgoing.ListingSimpleOutDto;
@@ -25,8 +26,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -52,9 +51,15 @@ public class ListingController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SimpleMessageResponseDto> handlePost(
             @RequestBody @Valid ListingCreateDto dto,
-            @AuthenticationPrincipal UserDetails principal
+            @RequestHeader("Authorization") String authHeader
     ) {
         log.info("Handling POST /listings request.");
+
+        // Validate user token
+        TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
+        if (!userValidation.valid() || userValidation.id() == null) {
+            throw new BadRequestException("Invalid or missing authentication token.");
+        }
 
         CityWithParentCountyOutDto city = filterServiceClient.getCityById(dto.cityId());
         // Validate city exists in location service
@@ -67,18 +72,12 @@ public class ListingController {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 
-        // Get user ID from auth service
-        Long userId = authServiceClient.getUserIdByUsername(principal.getUsername());
-        if (userId == null) {
-            throw new BadRequestException("User not found: " + principal.getUsername());
-        }
-
         Listing listing = listingMapper.createDtoToListing(dto);
         listing.setCityId(city.id());
         listing.setCountyId(city.county().id());
         listing.setCountryId(city.county().country().id());
         listing.setCategoryId(dto.categoryId());
-        listing.setOwnerId(userId);
+        listing.setOwnerId(userValidation.id());
 
         Listing createdListing = listingService.create(listing);
 
@@ -147,8 +146,14 @@ public class ListingController {
     public ResponseEntity<SimpleMessageResponseDto> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
-            @AuthenticationPrincipal UserDetails principal) {
+            @RequestHeader("Authorization") String authHeader) {
         log.info("Handling PUT /listings/{} request.", id);
+
+        // Validate user token
+        TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
+        if (!userValidation.valid() || userValidation.id() == null) {
+            throw new BadRequestException("Invalid or missing authentication token.");
+        }
 
         if (dto.id() != id) {
             throw new BadRequestException("Id mismatch between URL and body.");
@@ -165,12 +170,6 @@ public class ListingController {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 
-        // Get user ID from auth service
-        Long userId = authServiceClient.getUserIdByUsername(principal.getUsername());
-        if (userId == null) {
-            throw new BadRequestException("User not found: " + principal.getUsername());
-        }
-
         Listing existingListing = listingService.findById(id);
         if (existingListing == null) {
             throw new ResourceNotFoundException("Listing with id " + id + " not found.");
@@ -181,7 +180,7 @@ public class ListingController {
         listing.setCountyId(city.county().id());
         listing.setCountryId(city.county().country().id());
         listing.setCategoryId(dto.categoryId());
-        listing.setOwnerId(userId);
+        listing.setOwnerId(userValidation.id());
         listing.setImages(existingListing.getImages());
 
         listingService.update(listing);
@@ -211,5 +210,15 @@ public class ListingController {
                         || filterCriteria.getCityId() != null
                         || filterCriteria.getCategoryId() != null
         ));
+    }
+
+    private TokenValidationResponseDto validateAndGetUser(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Missing or invalid Authorization header.");
+            return new TokenValidationResponseDto(null, null, null, false);
+        }
+
+        String token = authHeader.substring(7);
+        return authServiceClient.validateToken(token);
     }
 }

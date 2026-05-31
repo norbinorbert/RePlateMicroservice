@@ -5,6 +5,7 @@ import edu.bbte.replate.auth.service.JwtService;
 import edu.bbte.replate.auth.service.UserService;
 import edu.bbte.replate.shared.dto.incoming.LoginDto;
 import edu.bbte.replate.shared.dto.incoming.RegisterDto;
+import edu.bbte.replate.shared.dto.internal.TokenValidationResponseDto;
 import edu.bbte.replate.shared.dto.internal.UserInfoDto;
 import edu.bbte.replate.shared.dto.outgoing.LoginResponseDto;
 import edu.bbte.replate.shared.dto.outgoing.SimpleMessageResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -113,5 +115,57 @@ public class AuthController {
 
         UserInfoDto userInfo = new UserInfoDto(user.getId(), user.getUsername(), user.getEmail());
         return ResponseEntity.ok(userInfo);
+    }
+
+    @PostMapping("/validate-token")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TokenValidationResponseDto> handleValidateToken(
+            @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        log.info("Handling POST /auth/validate-token request.");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            log.warn("Missing or invalid Authorization header.");
+            var response = new TokenValidationResponseDto(null, null, null, false);
+            return ResponseEntity.ok(response);
+        }
+
+        try {
+            String token = authorizationHeader.substring(7);
+            String username = jwtService.extractUsername(token);
+
+            if (username == null) {
+                log.warn("Could not extract username from token.");
+                var response = new TokenValidationResponseDto(null, null, null, false);
+                return ResponseEntity.ok(response);
+            }
+
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                log.warn("User '{}' not found in database.", username);
+                var response = new TokenValidationResponseDto(null, null, null, false);
+                return ResponseEntity.ok(response);
+            }
+
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (!jwtService.validateToken(token, userDetails)) {
+                log.warn("Invalid JWT token for user '{}'.", username);
+                var response = new TokenValidationResponseDto(null, null, null, false);
+                return ResponseEntity.ok(response);
+            }
+
+            log.info("Token validated successfully for user '{}'.", username);
+            var response = new TokenValidationResponseDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    true
+            );
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error validating token: {}", e.getMessage(), e);
+            var response = new TokenValidationResponseDto(null, null, null, false);
+            return ResponseEntity.ok(response);
+        }
     }
 }
