@@ -1,13 +1,9 @@
-version: '3.9'
-
 services:
   mysql:
-    image: mysql:8.0-alpine
+    image: mysql:latest
     container_name: replate-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${MYSQL_USER:-replate_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-replate_password}
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
@@ -31,8 +27,8 @@ services:
     environment:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_USER: ${MYSQL_USER:-replate_user}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-replate_password}
+      DATABASE_USER: ${MYSQL_USER:-root}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES:-prod}
@@ -57,8 +53,8 @@ services:
     environment:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_USER: ${MYSQL_USER:-replate_user}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-replate_password}
+      DATABASE_USER: ${MYSQL_USER:-root}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-root}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES:-prod}
     depends_on:
       mysql:
@@ -81,11 +77,11 @@ services:
     environment:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_USER: ${MYSQL_USER:-replate_user}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-replate_password}
+      DATABASE_USER: ${MYSQL_USER:-root}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       AUTH_SERVICE_URL: http://auth-service:8081
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES:-prod}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES:-create}
     depends_on:
       mysql:
         condition: service_healthy

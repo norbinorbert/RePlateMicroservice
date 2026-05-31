@@ -49,7 +49,7 @@ RePlate/
 ### 3. Location Service (Port 8083)
 **Responsibility:** Geographic data and product categories (internal service)
 
-**Database:** `replate_locations`
+**Database:** `replate_filters`
 
 **Endpoints:**
 - `GET /categories/top-level` - Top-level categories
@@ -132,12 +132,12 @@ kubectl exec -it deployment/mysql -n replate -- mysql -uroot -p$MYSQL_ROOT_PASSW
 # In MySQL CLI:
 CREATE DATABASE replate_auth;
 CREATE DATABASE replate_listings;
-CREATE DATABASE replate_locations;
+CREATE DATABASE replate_filters;
 
 # Grant permissions:
 GRANT ALL PRIVILEGES ON replate_auth.* TO 'replate_user'@'%';
 GRANT ALL PRIVILEGES ON replate_listings.* TO 'replate_user'@'%';
-GRANT ALL PRIVILEGES ON replate_locations.* TO 'replate_user'@'%';
+GRANT ALL PRIVILEGES ON replate_filters.* TO 'replate_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
@@ -175,7 +175,7 @@ kubectl apply -f k8s/auth-service.yaml
 kubectl apply -f k8s/listing-service.yaml
 
 # Deploy Location Service
-kubectl apply -f k8s/location-service.yaml
+kubectl apply -f k8s/filter-service.yaml
 ```
 
 #### Step 6: Verify Deployments
@@ -400,7 +400,7 @@ To remove all RePlate resources:
 # Delete all services
 kubectl delete -f k8s/auth-service.yaml
 kubectl delete -f k8s/listing-service.yaml
-kubectl delete -f k8s/location-service.yaml
+kubectl delete -f k8s/filter-service.yaml
 kubectl delete -f k8s/mysql.yaml
 kubectl delete -f k8s/common-resources.yaml
 

@@ -40,7 +40,7 @@ public class ListingController {
     private ListingService listingService;
 
     @Autowired
-    private FilterServiceClient locationServiceClient;
+    private FilterServiceClient filterServiceClient;
 
     @Autowired
     private AuthServiceClient authServiceClient;
@@ -56,14 +56,14 @@ public class ListingController {
     ) {
         log.info("Handling POST /listings request.");
 
-        CityWithParentCountyOutDto city = locationServiceClient.getCityById(dto.cityId());
+        CityWithParentCountyOutDto city = filterServiceClient.getCityById(dto.cityId());
         // Validate city exists in location service
         if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
         // Validate category exists in location service
-        if (locationServiceClient.getCategoryById(dto.categoryId()) == null) {
+        if (filterServiceClient.getCategoryById(dto.categoryId()) == null) {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 
@@ -154,14 +154,14 @@ public class ListingController {
             throw new BadRequestException("Id mismatch between URL and body.");
         }
 
-        CityWithParentCountyOutDto city = locationServiceClient.getCityById(dto.cityId());
+        CityWithParentCountyOutDto city = filterServiceClient.getCityById(dto.cityId());
         // Validate city exists
         if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
         }
 
         // Validate category exists
-        if (locationServiceClient.getCategoryById(dto.categoryId()) == null) {
+        if (filterServiceClient.getCategoryById(dto.categoryId()) == null) {
             throw new BadRequestException("No category with id " + dto.categoryId() + " exists.");
         }
 

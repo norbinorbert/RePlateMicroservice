@@ -36,13 +36,13 @@
 - City lookup: `GET /locations/cities/{id}`
 - Geographic hierarchy: Countries → Counties → Cities → Categories
 - Health check endpoint: `GET /health`
-- **Database:** `replate_locations` (MySQL)
+- **Database:** `replate_filters` (MySQL)
 - **Access:** Internal only (no external Ingress)
 
 ### 3. **Database Per Service Pattern** ✓
 - Auth Service: `replate_auth` database
 - Listing Service: `replate_listings` database
-- Location Service: `replate_locations` database
+- Location Service: `replate_filters` database
 - Independent schemas with no direct cross-service database access
 - Services communicate via REST APIs
 

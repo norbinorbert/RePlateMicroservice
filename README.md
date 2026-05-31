@@ -63,7 +63,7 @@ A refactored version of the RePlate monolith split into 3 independent microservi
 - Product categories with parent-child relationships
 - Accessed internally by Listing Service
 - No external Ingress (ClusterIP only)
-- **Database:** `replate_locations`
+- **Database:** `replate_filters`
 - **Port:** 8083
 
 ## 🚀 Quick Start
@@ -135,7 +135,7 @@ kubectl apply -f k8s/mysql.yaml
 # 3. Deploy all services
 kubectl apply -f k8s/auth-service.yaml
 kubectl apply -f k8s/listing-service.yaml
-kubectl apply -f k8s/location-service.yaml
+kubectl apply -f k8s/filter-service.yaml
 ```
 
 ### Verify Deployment
@@ -264,7 +264,7 @@ images
 └── mime_type
 ```
 
-### Location Database (replate_locations)
+### Location Database (replate_filters)
 ```
 categories
 ├── id (PK)
