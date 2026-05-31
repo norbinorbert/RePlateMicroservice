@@ -1,13 +1,9 @@
 package edu.bbte.replate.listing.util;
 
-import edu.bbte.replate.listing.client.AuthServiceClient;
 import edu.bbte.replate.listing.model.Listing;
 import edu.bbte.replate.listing.service.ListingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -18,36 +14,17 @@ public class ListingSecurity {
     @Autowired
     private ListingService listingService;
 
-    @Autowired
-    private AuthServiceClient authServiceClient;
-
-    public boolean isOwner(Long listingId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            log.warn("Authentication is null or not authenticated");
-            return false;
-        }
-
-        // Get username from authentication principal
-        Object principal = authentication.getPrincipal();
-        String username = null;
-
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else if (principal instanceof String) {
-            username = (String) principal;
-        }
-
-        if (username == null) {
-            log.warn("Could not extract username from authentication");
-            return false;
-        }
-
-        // Get user ID from auth service
-        Long userId = authServiceClient.getUserIdByUsername(username);
+    /**
+     * Check if the provided user ID is the owner of the listing.
+     * This method is used for direct user ID validation (without needing SecurityContext).
+     *
+     * @param listingId the ID of the listing
+     * @param userId    the ID of the user to check
+     * @return true if the user is the owner of the listing, false otherwise
+     */
+    public boolean isOwnerByUserId(Long listingId, Long userId) {
         if (userId == null) {
-            log.warn("Could not find user ID for username: {}", username);
+            log.warn("User ID is null");
             return false;
         }
 

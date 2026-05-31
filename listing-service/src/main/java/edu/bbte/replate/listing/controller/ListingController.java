@@ -5,6 +5,7 @@ import edu.bbte.replate.listing.client.FilterServiceClient;
 import edu.bbte.replate.listing.mapper.ListingMapper;
 import edu.bbte.replate.listing.model.Listing;
 import edu.bbte.replate.listing.service.ListingService;
+import edu.bbte.replate.listing.util.ListingSecurity;
 import edu.bbte.replate.shared.dto.incoming.FilterCriteria;
 import edu.bbte.replate.shared.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.shared.dto.incoming.ListingUpdateDto;
@@ -25,7 +26,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -46,6 +46,9 @@ public class ListingController {
 
     @Autowired
     private ListingMapper listingMapper;
+
+    @Autowired
+    private ListingSecurity listingSecurity;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -142,7 +145,6 @@ public class ListingController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@listingSecurity.isOwner(#id)")
     public ResponseEntity<SimpleMessageResponseDto> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
@@ -153,6 +155,11 @@ public class ListingController {
         TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
         if (!userValidation.valid() || userValidation.id() == null) {
             throw new BadRequestException("Invalid or missing authentication token.");
+        }
+
+        // Check ownership
+        if (!listingSecurity.isOwnerByUserId(id, userValidation.id())) {
+            throw new BadRequestException("User is not authorized to update this listing.");
         }
 
         if (dto.id() != id) {
@@ -190,9 +197,21 @@ public class ListingController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@listingSecurity.isOwner(#id)")
-    public ResponseEntity<SimpleMessageResponseDto> handleDelete(@PathVariable long id) {
+    public ResponseEntity<SimpleMessageResponseDto> handleDelete(
+            @PathVariable long id,
+            @RequestHeader("Authorization") String authHeader) {
         log.info("Handling DELETE /listings/{} request.", id);
+
+        // Validate user token
+        TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
+        if (!userValidation.valid() || userValidation.id() == null) {
+            throw new BadRequestException("Invalid or missing authentication token.");
+        }
+
+        // Check ownership
+        if (!listingSecurity.isOwnerByUserId(id, userValidation.id())) {
+            throw new BadRequestException("User is not authorized to delete this listing.");
+        }
 
         listingService.delete(id);
 

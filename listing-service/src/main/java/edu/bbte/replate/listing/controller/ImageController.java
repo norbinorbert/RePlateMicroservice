@@ -1,11 +1,15 @@
 package edu.bbte.replate.listing.controller;
 
+import edu.bbte.replate.listing.client.AuthServiceClient;
 import edu.bbte.replate.listing.mapper.ImageMapper;
 import edu.bbte.replate.listing.model.Image;
 import edu.bbte.replate.listing.service.ImageService;
+import edu.bbte.replate.listing.util.ListingSecurity;
+import edu.bbte.replate.shared.dto.internal.TokenValidationResponseDto;
 import edu.bbte.replate.shared.dto.outgoing.ImageDownloadDto;
 import edu.bbte.replate.shared.dto.outgoing.ImageOutDto;
 import edu.bbte.replate.shared.dto.outgoing.SimpleMessageResponseDto;
+import edu.bbte.replate.shared.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,14 +33,31 @@ public class ImageController {
     @Autowired
     private ImageMapper imageMapper;
 
+    @Autowired
+    private AuthServiceClient authServiceClient;
+
+    @Autowired
+    private ListingSecurity listingSecurity;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId)")
     public ResponseEntity<SimpleMessageResponseDto> handleUploadImage(
             @PathVariable long listingId,
-            @RequestPart("file") MultipartFile file
+            @RequestPart("file") MultipartFile file,
+            @RequestHeader("Authorization") String authHeader
     ) {
         log.info("Handling POST /listing/{}/images request.", listingId);
+
+        // Validate user token
+        TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
+        if (!userValidation.valid() || userValidation.id() == null) {
+            throw new BadRequestException("Invalid or missing authentication token.");
+        }
+
+        // Check ownership
+        if (!listingSecurity.isOwnerByUserId(listingId, userValidation.id())) {
+            throw new BadRequestException("User is not authorized to upload images for this listing.");
+        }
 
         Image createdImage = imageService.upload(listingId, file);
 
@@ -94,15 +114,36 @@ public class ImageController {
 
     @DeleteMapping("/{imageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId)")
     public ResponseEntity<SimpleMessageResponseDto> handleDeleteImageOfListingById(
             @PathVariable long listingId,
-            @PathVariable long imageId
+            @PathVariable long imageId,
+            @RequestHeader("Authorization") String authHeader
     ) {
         log.info("Handling DELETE /listings/{}/images/{} request.", listingId, imageId);
+
+        // Validate user token
+        TokenValidationResponseDto userValidation = validateAndGetUser(authHeader);
+        if (!userValidation.valid() || userValidation.id() == null) {
+            throw new BadRequestException("Invalid or missing authentication token.");
+        }
+
+        // Check ownership
+        if (!listingSecurity.isOwnerByUserId(listingId, userValidation.id())) {
+            throw new BadRequestException("User is not authorized to upload images for this listing.");
+        }
 
         // Exceptions handled in service
         imageService.delete(listingId, imageId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    private TokenValidationResponseDto validateAndGetUser(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Missing or invalid Authorization header.");
+            return new TokenValidationResponseDto(null, null, null, false);
+        }
+
+        String token = authHeader.substring(7);
+        return authServiceClient.validateToken(token);
     }
 }
