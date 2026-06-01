@@ -1,71 +1,10 @@
----
-# PersistentVolume for MySQL data
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv
-  namespace: replate
-spec:
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /data/mysql
-
----
-# PersistentVolumeClaim for MySQL
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-  namespace: replate
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-
----
-# MySQL ConfigMap
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-config
-  namespace: replate
-data:
-  my.cnf: |
-    [mysqld]
-    character-set-server=utf8mb4
-    collation-server=utf8mb4_unicode_ci
-    max_connections=1000
-    max_allowed_packet=256M
-    default-storage-engine=InnoDB
-
----
-# MySQL Secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysql-secret
-  namespace: replate
-type: Opaque
-stringData:
-  MYSQL_ROOT_PASSWORD: "root_password_change_me"
-  MYSQL_USER: "replate_user"
-  MYSQL_PASSWORD: "user_password_change_me"
-
----
-# MySQL Deployment
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mysql
   namespace: replate
-  labels:
-    app: mysql
 spec:
+  serviceName: mysql
   replicas: 1
   selector:
     matchLabels:
@@ -77,31 +16,21 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:8.0-alpine
+          image: mysql:9.0
           ports:
             - containerPort: 3306
-              name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_ROOT_PASSWORD
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_USER
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_PASSWORD
+                  name: replate-secrets
+                  key: mysql-root-password
           volumeMounts:
-            - name: mysql-storage
+            - name: mysql-data
               mountPath: /var/lib/mysql
-            - name: mysql-config
-              mountPath: /etc/mysql/conf.d
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
           livenessProbe:
             exec:
               command: [ "mysqladmin", "ping", "-h", "localhost" ]
@@ -112,35 +41,30 @@ spec:
               command: [ "mysqladmin", "ping", "-h", "localhost" ]
             initialDelaySeconds: 10
             periodSeconds: 5
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "1000m"
       volumes:
-        - name: mysql-storage
-          persistentVolumeClaim:
-            claimName: mysql-pvc
-        - name: mysql-config
+        - name: mysql-init
           configMap:
-            name: mysql-config
+            name: replate-mysql-init-config
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
 
 ---
-# MySQL Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-service
+  name: mysql
   namespace: replate
-  labels:
-    app: mysql
 spec:
+  clusterIP: None
   ports:
     - port: 3306
       targetPort: 3306
   selector:
     app: mysql
-  type: ClusterIP
 

@@ -1,0 +1,58 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-ingress
+  namespace: replate
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: auth.replate.com
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8081
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: filter-ingress
+  namespace: replate
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: filter.replate.com
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: filter-service
+                port:
+                  number: 8083
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: listing-ingress
+  namespace: replate
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: listing.replate.com
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: listing-service
+                port:
+                  number: 8082

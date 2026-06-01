@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: replate-config
+  namespace: replate
+data:
+  mysql-host: mysql
+  mysql-port: "3306"
+  auth-service-url: http://auth-service:8081
+  filter-service-url: http://filter-service:8083
+  jwt-expiration: "86400000"
+  spring-profiles-active: prod
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: replate-mysql-init-config
+  namespace: replate
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS replate_auth;
+    CREATE DATABASE IF NOT EXISTS replate_listings;
+    CREATE DATABASE IF NOT EXISTS replate_filters;
