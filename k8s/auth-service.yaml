@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: replate/auth-service:latest
+          image: norbinorbert/replate-auth-service:1.0.0
           ports:
             - containerPort: 8081
           env:

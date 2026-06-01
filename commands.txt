@@ -1,0 +1,6 @@
+docker-compose build
+docker-compose up -d
+docker container ls
+docker container commit <ID> <name:version>
+docker tag <name:version> <docker-username>/<name:version>
+docker push <docker-username>/<name:version>
