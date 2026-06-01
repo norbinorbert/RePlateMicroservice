@@ -4,3 +4,38 @@ docker container ls
 docker container commit <ID> <name:version>
 docker tag <name:version> <docker-username>/<name:version>
 docker push <docker-username>/<name:version>
+
+az login
+az aks list --output table
+az aks get-credentials --resource-group replate-rg --name replate-cluster
+kubectl get nodes
+
+kubectl apply -f k8s/namespace.yaml
+kubectl get ns
+
+kubectl apply -f k8s/secret.yaml
+kubectl get secrets -n replate
+
+kubectl apply -f k8s/configmap.yaml
+kubectl get configmap -n replate
+
+kubectl apply -f k8s/mysql.yaml
+kubectl logs mysql-0 -n replate
+
+kubectl apply -f k8s/auth-service.yaml
+kubectl logs deployment/auth-service -n replate
+
+kubectl apply -f k8s/filter-service.yaml
+kubectl logs deployment/filter-service -n replate
+
+kubectl apply -f k8s/listing-service.yaml
+kubectl logs deployment/listing-service -n replate
+
+kubectl get pods -n replate
+kubectl get svc -n replate
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+kubectl get svc -n ingress-nginx
+
+kubectl apply -f k8s/ingress.yaml
+kubectl get ingress -n replate

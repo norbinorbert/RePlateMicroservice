@@ -6,10 +6,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: auth.replate.com
     - http:
         paths:
-          - path: /
+          - path: /auth
             pathType: Prefix
             backend:
               service:
@@ -26,10 +25,16 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: filter.replate.com
     - http:
         paths:
-          - path: /
+          - path: /locations
+            pathType: Prefix
+            backend:
+              service:
+                name: filter-service
+                port:
+                  number: 8083
+          - path: /categories
             pathType: Prefix
             backend:
               service:
@@ -46,10 +51,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: listing.replate.com
     - http:
         paths:
-          - path: /
+          - path: /listings
             pathType: Prefix
             backend:
               service:
