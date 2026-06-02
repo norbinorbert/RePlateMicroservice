@@ -75,7 +75,7 @@ spec:
             timeoutSeconds: 5
           volumeMounts:
             - name: uploads
-              mountPath: /app/uploads
+              mountPath: /uploads/images
       volumes:
         - name: uploads
           emptyDir: { }

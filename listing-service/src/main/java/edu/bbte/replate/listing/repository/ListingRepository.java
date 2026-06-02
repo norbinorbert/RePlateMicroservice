@@ -54,26 +54,24 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
         boolean filterByCity = filterByCounty && cityId != null;
 
         if (filterByCountry) {
-            locationPredicates.add(cb.equal(root.get("country_id"), countryId));
+            locationPredicates.add(cb.equal(root.get("countryId"), countryId));
         }
 
         if (filterByCounty) {
-            locationPredicates.add(cb.equal(root.get("county_id"), countyId));
+            locationPredicates.add(cb.equal(root.get("countyId"), countyId));
         }
 
         if (filterByCity) {
-            locationPredicates.add(cb.equal(root.get("city_id"), cityId));
+            locationPredicates.add(cb.equal(root.get("cityId"), cityId));
         }
 
         return cb.and(locationPredicates.toArray(new Predicate[0]));
     }
 
-    // Helper method to build category predicate (basically filtering by category and its ancestors)
-    // example: if filtering by "Electronics", also include listings in "Mobile Phones" if
-    // "Mobile Phones" is a subcategory of "Electronics"
+    // Helper method to build category predicate (basically filtering by category)
     private Predicate buildCategoryPredicate(Root<Listing> root,
                                              CriteriaBuilder cb,
                                              Long categoryId) {
-        return cb.and(cb.equal(root.get("category").get("id"), categoryId));
+        return cb.and(cb.equal(root.get("categoryId"), categoryId));
     }
 }

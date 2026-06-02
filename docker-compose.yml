@@ -91,7 +91,7 @@ services:
       filter-service:
         condition: service_healthy
     volumes:
-      - uploads:/app/uploads
+      - uploads:/uploads/images
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
       interval: 30s
