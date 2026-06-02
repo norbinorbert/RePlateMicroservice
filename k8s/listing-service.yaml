@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: listing-service
-          image: norbinorbert/replate-listing-service:1.0.0
+          image: norbinorbert/replate-listing-service:1.0.1
           ports:
               - containerPort: 8082
           env:

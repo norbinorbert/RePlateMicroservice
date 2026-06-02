@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: filter-service
-          image: norbinorbert/replate-filter-service:1.0.0
+          image: norbinorbert/replate-filter-service:1.0.1
           ports:
             - containerPort: 8083
           env:

@@ -39,3 +39,5 @@ kubectl get svc -n ingress-nginx
 
 kubectl apply -f k8s/ingress.yaml
 kubectl get ingress -n replate
+
+kubectl delete pod <pod-name> -n replate
