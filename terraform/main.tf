@@ -52,3 +52,62 @@ resource "azurerm_kubernetes_cluster_node_pool" "res-2" {
     max_surge = "10%"
   }
 }
+
+resource "time_sleep" "wait_for_cluster" {
+  depends_on = [azurerm_kubernetes_cluster.res-1]
+  create_duration = "30s"
+}
+
+resource "kubectl_manifest" "namespace" {
+  yaml_body  = file("${path.module}/../k8s/namespace.yaml")
+  depends_on = [time_sleep.wait_for_cluster]
+}
+
+resource "kubectl_manifest" "secret" {
+  yaml_body  = file("${path.module}/../k8s/secret.yaml")
+  depends_on = [kubectl_manifest.namespace]
+}
+
+resource "kubectl_manifest" "configmap" {
+  yaml_body  = file("${path.module}/../k8s/configmap.yaml")
+  depends_on = [kubectl_manifest.secret]
+}
+
+resource "kubectl_manifest" "mysql" {
+  yaml_body  = file("${path.module}/../k8s/mysql.yaml")
+  depends_on = [kubectl_manifest.configmap]
+}
+
+resource "time_sleep" "wait_for_mysql" {
+  depends_on = [kubectl_manifest.mysql]
+  create_duration = "30s"
+}
+
+resource "kubectl_manifest" "auth_service" {
+  yaml_body  = file("${path.module}/../k8s/auth-service.yaml")
+  depends_on = [time_sleep.wait_for_mysql]
+}
+
+resource "kubectl_manifest" "filter_service" {
+  yaml_body  = file("${path.module}/../k8s/filter-service.yaml")
+  depends_on = [kubectl_manifest.auth_service]
+}
+
+resource "kubectl_manifest" "listing_service" {
+  yaml_body  = file("${path.module}/../k8s/listing-service.yaml")
+  depends_on = [kubectl_manifest.filter_service]
+}
+
+data "http" "ingress_nginx" {
+  url = "https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml"
+}
+
+resource "kubectl_manifest" "ingress_nginx" {
+  yaml_body  = data.http.ingress_nginx.response_body
+  depends_on = [kubectl_manifest.listing_service]
+}
+
+resource "kubectl_manifest" "ingress" {
+  yaml_body  = file("${path.module}/../k8s/ingress.yaml")
+  depends_on = [kubectl_manifest.ingress_nginx]
+}
