@@ -38,3 +38,10 @@ out/
 
 ### Folder for uploaded user content ###
 /uploads/**
+
+# terraform
+*.tfstate
+*.tfstate.*
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/provider.tf

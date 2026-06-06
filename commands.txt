@@ -41,3 +41,5 @@ kubectl apply -f k8s/ingress.yaml
 kubectl get ingress -n replate
 
 kubectl delete pod <pod-name> -n replate
+
+aztfexport resource-group -o terraform replate-rg
