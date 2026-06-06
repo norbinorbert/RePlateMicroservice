@@ -3,8 +3,14 @@ kind: Ingress
 metadata:
   name: auth-ingress
   namespace: replate
+  annotations:
+    cert-manager.io/cluster-issuer: "replate-selfsigned-issuer"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - "68.210.88.133"
+      secretName: replate-tls
   rules:
     - http:
         paths:
@@ -22,8 +28,14 @@ kind: Ingress
 metadata:
   name: filter-ingress
   namespace: replate
+  annotations:
+    cert-manager.io/cluster-issuer: "replate-selfsigned-issuer"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - "68.210.88.133"
+      secretName: replate-tls
   rules:
     - http:
         paths:
@@ -48,8 +60,14 @@ kind: Ingress
 metadata:
   name: listing-ingress
   namespace: replate
+  annotations:
+    cert-manager.io/cluster-issuer: "replate-selfsigned-issuer"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - "68.210.88.133"
+      secretName: replate-tls
   rules:
     - http:
         paths:

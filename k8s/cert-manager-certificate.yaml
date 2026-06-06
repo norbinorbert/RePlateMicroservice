@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: replate-tls
+  namespace: replate
+spec:
+  secretName: replate-tls
+  issuerRef:
+    name: replate-selfsigned-issuer
+    kind: ClusterIssuer
+  ipAddresses:
+    - "68.210.88.133"
